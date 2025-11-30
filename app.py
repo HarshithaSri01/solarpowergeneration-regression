@@ -119,10 +119,20 @@ st.subheader("Prediction")
 
 if st.button("Predict Solar Power"):
     try:
-        input_array = np.array([[inputs[f] for f in feature_names]])
+        # Build input array in feature order
+        input_array = np.array([[inputs[f] for f in feature_names]], dtype=float)
+
+        # Show raw inputs in debug
+        with st.expander("Show input going into the model"):
+            st.write("Feature names:", feature_names)
+            st.write("Input values (as array):", input_array)
+
+        # Apply scaler if available
         if scaler is not None:
             try:
                 input_array = scaler.transform(input_array)
+                with st.expander("Scaled input (after scaler):"):
+                    st.write(input_array)
             except Exception as e:
                 st.warning("Scaler exists but failed to transform input. Predicting without scaler. Error: " + str(e))
 
@@ -131,7 +141,13 @@ if st.button("Predict Solar Power"):
             st.error(f"Input has {input_array.shape[1]} features but model expects {expected}.")
         else:
             prediction = model.predict(input_array)[0]
-            st.success(f"Estimated Solar Power Output: **{prediction:.2f} kW**")
+            prediction = float(prediction)
+
+            # Show raw prediction with high precision
+            st.success(f"Estimated Solar Power Output: **{prediction:.4f} kW**")
+
+            with st.expander("Raw prediction details"):
+                st.write("Raw prediction value:", prediction)
     except Exception as e:
         st.error("Prediction failed. See details below.")
         st.exception(e)
@@ -147,9 +163,3 @@ with st.expander("Debug info (show if things go wrong)"):
     st.write("feature names used by UI:", feature_names)
     st.write("Load message (raw):")
     st.write(load_message)
-
-
-
-
-
-      
