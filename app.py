@@ -29,17 +29,19 @@ with col2:
     solar_radiation = st.number_input("Solar Radiation (W/m²)", min_value=0.0, max_value=1500.0, value=500.0)
     cloud_cover = st.number_input("Cloud Cover (%)", min_value=0.0, max_value=100.0, value=20.0)
 
-# Block 3: Prediction
+# Block 3: Prediction (safer)
 st.subheader("Prediction")
 
 if st.button("Predict Solar Power"):
-    # Combine user inputs into a single row
-    input_data = np.array([[temperature, humidity, wind_speed, pressure, solar_radiation, cloud_cover]])
+    try:
+        # Combine user inputs into a single row (numpy array)
+        input_data = np.array([[temperature, humidity, wind_speed, pressure, solar_radiation, cloud_cover]])
 
-    # Convert to DataFrame (optional but cleaner)
-    input_df = pd.DataFrame(input_data, columns=["Temperature", "Humidity", "WindSpeed", "Pressure", "SolarRadiation", "CloudCover"])
+        # If your model requires scaling, this will be needed here (see notes below).
+        # Predict using the model with a numpy array (avoids column-name mismatch)
+        prediction = model.predict(input_data)[0]
 
-    # Predict using the model
-    prediction = model.predict(input_df)[0]
-
-    st.success(f"Estimated Solar Power Output: **{prediction:.2f} kW**")
+        st.success(f"Estimated Solar Power Output: **{prediction:.2f} kW**")
+    except Exception as e:
+        st.error("Prediction failed. See error details below.")
+        st.exception(e)
