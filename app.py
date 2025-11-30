@@ -28,3 +28,18 @@ with col2:
     pressure = st.number_input("Pressure (hPa)", min_value=800.0, max_value=1100.0, value=1010.0)
     solar_radiation = st.number_input("Solar Radiation (W/m²)", min_value=0.0, max_value=1500.0, value=500.0)
     cloud_cover = st.number_input("Cloud Cover (%)", min_value=0.0, max_value=100.0, value=20.0)
+
+# Block 3: Prediction
+st.subheader("Prediction")
+
+if st.button("Predict Solar Power"):
+    # Combine user inputs into a single row
+    input_data = np.array([[temperature, humidity, wind_speed, pressure, solar_radiation, cloud_cover]])
+
+    # Convert to DataFrame (optional but cleaner)
+    input_df = pd.DataFrame(input_data, columns=["Temperature", "Humidity", "WindSpeed", "Pressure", "SolarRadiation", "CloudCover"])
+
+    # Predict using the model
+    prediction = model.predict(input_df)[0]
+
+    st.success(f"Estimated Solar Power Output: **{prediction:.2f} kW**")
